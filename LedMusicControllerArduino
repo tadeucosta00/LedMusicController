@@ -1,0 +1,496 @@
+#include <FastLED.h>
+#define NUM_LEDS 20
+#define DATA_PIN 9
+#include <AudioAnalyzer.h>
+
+Analyzer Audio = Analyzer(4,5,0);//Strobe pin ->4  RST pin ->5 Analog Pin ->5
+static uint8_t hue = 0;
+
+typedef struct 
+{
+  int frequencia, led_inicio, led_fim, vermelho, verde , azul;
+} reg_frequencia;
+
+reg_frequencia tabela_frequencias[7];
+int numero_frequencias;
+int mediaamp = 0; 
+int jogodeluzes;
+int FreqVal[7];
+int maior = 0;
+CRGB leds[NUM_LEDS];
+void setup()
+{
+  Serial.begin(9600);	//Init the baudrate
+  Audio.Init();
+  FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);
+}
+
+//desliga
+void desliga(int vetor[]) {
+ if(max((FreqVal[0]-100),0) > 50) {
+    leds[19] = CRGB::Black;
+    leds[18] = CRGB::Black;
+    leds[17] = CRGB::Black;
+    FastLED.show();
+  } else {
+    leds[19] = CRGB::Black;
+    leds[18] = CRGB::Black;
+    leds[17] = CRGB::Black;
+    FastLED.show();
+  }
+  if(max((FreqVal[1]-100),0) > 50) {
+    leds[16] = CRGB::Black;
+    leds[15] = CRGB::Black;
+    leds[14] = CRGB::Black;
+    FastLED.show();
+    
+  } else {
+    leds[16] = CRGB::Black;
+    leds[15] = CRGB::Black;
+    leds[14] = CRGB::Black;
+    FastLED.show();
+  }
+  if(max((FreqVal[2]-100),0) > 50) {
+    leds[13] = CRGB::Black;
+    leds[12] = CRGB::Black;
+    leds[11] = CRGB::Black;
+    FastLED.show();
+    
+  } else {
+    leds[13] = CRGB::Black;
+    leds[12] = CRGB::Black;
+    leds[11] = CRGB::Black;
+    FastLED.show();
+  }
+  if(max((FreqVal[3]-100),0) > 30) {
+    leds[10] = CRGB::Black;
+    leds[9] = CRGB::Black;
+    leds[8] = CRGB::Black;
+    FastLED.show();
+    
+  } else {
+    leds[10] = CRGB::Black;
+    leds[9] = CRGB::Black;
+    leds[8] = CRGB::Black;
+    FastLED.show();
+  }
+  if(max((FreqVal[4]-100),0) > 30) {
+    leds[7] = CRGB::Black;
+    leds[6] = CRGB::Black;
+    leds[5] = CRGB::Black;
+    FastLED.show();
+    
+  } else {
+    leds[7] = CRGB::Black;
+    leds[6] = CRGB::Black;
+    leds[5] = CRGB::Black;
+    FastLED.show();
+  }
+   if(max((FreqVal[5]-100),0) > 50) {
+    leds[4] = CRGB::Black;
+    leds[3] = CRGB::Black;
+    leds[2] = CRGB::Black;
+    FastLED.show();
+    
+  } else {
+    leds[4] = CRGB::Black;
+    leds[3] = CRGB::Black;
+    leds[2] = CRGB::Black;
+    FastLED.show();
+  }
+  if(max((FreqVal[6]-100),0) > 50) {
+    leds[1] = CRGB::Black;
+    leds[0] = CRGB::Black;
+    FastLED.show();
+    
+  } else {
+    leds[1] = CRGB::Black;
+    leds[0] = CRGB::Black;
+    FastLED.show();
+  }
+  }
+
+//design 1
+
+void atualizaLeds(int vetor[]) {
+ if(max((FreqVal[0]-100),0) > 45) {
+    leds[19] = CRGB::Crimson;
+    leds[18] = CRGB::Crimson;
+    leds[17] = CRGB::Crimson;
+    FastLED.show();
+  } else {
+    leds[19] = CRGB::Black;
+    leds[18] = CRGB::Black;
+    leds[17] = CRGB::Black;
+    FastLED.show();
+  }
+  if(max((FreqVal[1]-100),0) > 50) {
+    leds[16] = CRGB::Blue;
+    leds[15] = CRGB::Blue;
+    leds[14] = CRGB::Blue;
+    FastLED.show();
+    
+  } else {
+    leds[16] = CRGB::Black;
+    leds[15] = CRGB::Black;
+    leds[14] = CRGB::Black;
+    FastLED.show();
+  }
+  if(max((FreqVal[2]-100),0) > 45) {
+    leds[13] = CRGB::ForestGreen;
+    leds[12] = CRGB::ForestGreen;
+    leds[11] = CRGB::ForestGreen;
+    FastLED.show();
+    
+  } else {
+    leds[13] = CRGB::Black;
+    leds[12] = CRGB::Black;
+    leds[11] = CRGB::Black;
+    FastLED.show();
+  }
+  if(max((FreqVal[3]-100),0) > 45) {
+    leds[10] = CRGB::Aqua;
+    leds[9] = CRGB::Aqua;
+    leds[8] = CRGB::Aqua;
+    FastLED.show();
+    
+  } else {
+    leds[10] = CRGB::Black;
+    leds[9] = CRGB::Black;
+    leds[8] = CRGB::Black;
+    FastLED.show();
+  }
+  if(max((FreqVal[4]-100),0) > 50) {
+    leds[7] = CRGB::Purple;
+    leds[6] = CRGB::Purple;
+    leds[5] = CRGB::Purple;
+    FastLED.show();
+    
+  } else {
+    leds[7] = CRGB::Black;
+    leds[6] = CRGB::Black;
+    leds[5] = CRGB::Black;
+    FastLED.show();
+  }
+   if(max((FreqVal[5]-100),0) > 25) {
+    leds[4] = CRGB::Red;
+    leds[3] = CRGB::Red;
+    leds[2] = CRGB::Red;
+    FastLED.show();
+    
+  } else {
+    leds[4] = CRGB::Black;
+    leds[3] = CRGB::Black;
+    leds[2] = CRGB::Black;
+    FastLED.show();
+  }
+  if(max((FreqVal[6]-100),0) > 25) {
+    leds[1] = CRGB::LightSlateGray;
+    leds[0] = CRGB::LightSlateGray;
+    FastLED.show();
+    
+  } else {
+    leds[1] = CRGB::Black;
+    leds[0] = CRGB::Black;
+    FastLED.show();
+  }
+  }
+
+  //design 2
+
+  void coresquentes(int vetor[]) {
+   if(max((FreqVal[0]-100),0) > 45) {
+    leds[19] = CRGB::LawnGreen;
+    leds[18] = CRGB::LawnGreen;
+    leds[17] = CRGB::LawnGreen;
+    FastLED.show();
+  } else {
+    leds[19] = CRGB::Black;
+    leds[18] = CRGB::Black;
+    leds[17] = CRGB::Black;
+    FastLED.show();
+  }
+  if(max((FreqVal[1]-100),0) > 50) {
+    leds[16] = CRGB::Orange;
+    leds[15] = CRGB::Orange;
+    leds[14] = CRGB::Orange;
+    FastLED.show();
+    
+  } else {
+    leds[16] = CRGB::Black;
+    leds[15] = CRGB::Black;
+    leds[14] = CRGB::Black;
+    FastLED.show();
+  }
+  if(max((FreqVal[2]-100),0) > 50) {
+    leds[13] = CRGB::Red;
+    leds[12] = CRGB::Red;
+    leds[11] = CRGB::Red;
+    FastLED.show();
+    
+  } else {
+    leds[13] = CRGB::Black;
+    leds[12] = CRGB::Black;
+    leds[11] = CRGB::Black;
+    FastLED.show();
+  }
+  if(max((FreqVal[3]-100),0) > 45) {
+    leds[10] = CRGB::Yellow;
+    leds[9] = CRGB::Yellow;
+    leds[8] = CRGB::Yellow;
+    FastLED.show();
+    
+  } else {
+    leds[10] = CRGB::Black;
+    leds[9] = CRGB::Black;
+    leds[8] = CRGB::Black;
+    FastLED.show();
+  }
+  if(max((FreqVal[4]-100),0) > 50) {
+    leds[7] = CRGB::Red;
+    leds[6] = CRGB::Red;
+    leds[5] = CRGB::Red;
+    FastLED.show();
+    
+  } else {
+    leds[7] = CRGB::Black;
+    leds[6] = CRGB::Black;
+    leds[5] = CRGB::Black;
+    FastLED.show();
+  }
+   if(max((FreqVal[5]-100),0) > 50) {
+    leds[4] = CRGB::Orange;
+    leds[3] = CRGB::Orange;
+    leds[2] = CRGB::Orange;
+    FastLED.show();
+    
+  } else {
+    leds[4] = CRGB::Black;
+    leds[3] = CRGB::Black;
+    leds[2] = CRGB::Black;
+    FastLED.show();
+  }
+  if(max((FreqVal[6]-100),0) > 30) {
+    leds[1] = CRGB::LawnGreen;
+    leds[0] = CRGB::LawnGreen;
+    FastLED.show();
+    
+  } else {
+    leds[1] = CRGB::Black;
+    leds[0] = CRGB::Black;
+    FastLED.show();
+  }
+  }
+ //DESIGN3
+
+ void coresfrias(int vetor[]) {
+ if(max((FreqVal[0]-100),0) > 45) {
+    leds[19] = CRGB::Blue;
+    leds[18] = CRGB::Blue;
+    leds[17] = CRGB::Blue;
+    FastLED.show();
+  } else {
+    leds[19] = CRGB::Black;
+    leds[18] = CRGB::Black;
+    leds[17] = CRGB::Black;
+    FastLED.show();
+  }
+  if(max((FreqVal[1]-100),0) > 50) {
+    leds[16] = CRGB::FloralWhite;
+    leds[15] = CRGB::FloralWhite;
+    leds[14] = CRGB::FloralWhite;
+    FastLED.show();
+    
+  } else {
+    leds[16] = CRGB::Black;
+    leds[15] = CRGB::Black;
+    leds[14] = CRGB::Black;
+    FastLED.show();
+  }
+  if(max((FreqVal[2]-100),0) > 45) {
+    leds[13] = CRGB::Green;
+    leds[12] = CRGB::Green;
+    leds[11] = CRGB::Green;
+    FastLED.show();
+    
+  } else {
+    leds[13] = CRGB::Black;
+    leds[12] = CRGB::Black;
+    leds[11] = CRGB::Black;
+    FastLED.show();
+  }
+  if(max((FreqVal[3]-100),0) > 45) {
+    leds[10] = CRGB::Purple;
+    leds[9] = CRGB::Purple;
+    leds[8] = CRGB::Purple;
+    FastLED.show();
+    
+  } else {
+    leds[10] = CRGB::Black;
+    leds[9] = CRGB::Black;
+    leds[8] = CRGB::Black;
+    FastLED.show();
+  }
+  if(max((FreqVal[4]-100),0) > 50) {
+    leds[7] = CRGB::Purple;
+    leds[6] = CRGB::Purple;
+    leds[5] = CRGB::Purple;
+    FastLED.show();
+    
+  } else {
+    leds[7] = CRGB::Black;
+    leds[6] = CRGB::Black;
+    leds[5] = CRGB::Black;
+    FastLED.show();
+  }
+   if(max((FreqVal[5]-100),0) > 25) {
+    leds[4] = CRGB::White;
+    leds[3] = CRGB::White;
+    leds[2] = CRGB::White;
+    FastLED.show();
+    
+  } else {
+    leds[4] = CRGB::Black;
+    leds[3] = CRGB::Black;
+    leds[2] = CRGB::Black;
+    FastLED.show();
+  }
+  if(max((FreqVal[6]-100),0) > 25) {
+    leds[1] = CRGB::PowderBlue;
+    leds[0] = CRGB::PowderBlue;
+    FastLED.show();
+    
+  } else {
+    leds[1] = CRGB::Black;
+    leds[0] = CRGB::Black;
+    FastLED.show();
+  }
+  }
+ 
+ //LIMPA TABELA
+ void limpa_tabela()
+ {
+    for(int linha=0; linha<7;linha++)  
+    {
+      tabela_frequencias[linha].frequencia = -1;
+      tabela_frequencias[linha].led_inicio = -1;
+      tabela_frequencias[linha].led_fim = -1;
+      tabela_frequencias[linha].vermelho = -1;
+      tabela_frequencias[linha].verde = -1;
+      tabela_frequencias[linha].azul = -1;
+    }
+ }
+  
+String MENSAGEM;
+String JOGO;
+int estadoBotao = 0;
+char leitura = Serial.read();
+void loop()
+{
+numero_frequencias = 0;
+int linha=0;
+if ( Serial.available()>0)
+{  
+   MENSAGEM=Serial.readStringUntil('\n'); 
+   if (MENSAGEM=="CORESQUENTES")    {JOGO="CORESQUENTES";Serial.println(JOGO);}
+   else if (MENSAGEM=="TOCATABELA")    {   JOGO="TOCATABELA";/*Serial.println(JOGO);*/}
+   else if (MENSAGEM=="DESLIGADO")    {JOGO="DESLIGADO";Serial.println(JOGO);}
+   else if (MENSAGEM=="CORESFRIAS")    {JOGO="CORESFRIAS";Serial.println(JOGO);}
+   else if (MENSAGEM=="CORESALEATORIAS")    {JOGO="CORESALEATORIAS";Serial.println(JOGO);}
+   else if (MENSAGEM=="?CAIXAMUSICA")    {Serial.println("CAIXAENCONTRADA");}
+   else if(MENSAGEM=="NOVASFREQUENCIAS")  
+   { 
+       
+       limpa_tabela();
+       MENSAGEM = Serial.readStringUntil('\n');  
+       numero_frequencias = MENSAGEM.toInt();
+       Serial.println(numero_frequencias);
+       
+     
+       for(int linha=0; linha<numero_frequencias;linha++)
+        {
+          MENSAGEM = Serial.readStringUntil('\n');
+          tabela_frequencias[linha].frequencia = MENSAGEM.toInt();
+          MENSAGEM = Serial.readStringUntil('\n');
+          tabela_frequencias[linha].led_inicio = MENSAGEM.toInt();
+          MENSAGEM = Serial.readStringUntil('\n');
+          tabela_frequencias[linha].led_fim = MENSAGEM.toInt();
+          MENSAGEM = Serial.readStringUntil('\n');
+          tabela_frequencias[linha].vermelho = MENSAGEM.toInt();
+          MENSAGEM = Serial.readStringUntil('\n');
+          tabela_frequencias[linha].verde = MENSAGEM.toInt();
+          MENSAGEM = Serial.readStringUntil('\n');
+          tabela_frequencias[linha].azul = MENSAGEM.toInt();        
+        }
+        MENSAGEM = String(numero_frequencias);
+        Serial.println(MENSAGEM);
+        
+   }  
+  else if(MENSAGEM=="LERFREQUENCIAS")
+  {
+          //Serial.println(numero_frequencias);
+        for(int linha=0; linha<7;linha++)
+        {
+          Serial.println(tabela_frequencias[linha].frequencia);
+          Serial.println(tabela_frequencias[linha].led_inicio);
+          Serial.println(tabela_frequencias[linha].led_fim); 
+          Serial.println(tabela_frequencias[linha].vermelho);
+          Serial.println(tabela_frequencias[linha].verde); 
+          Serial.println(tabela_frequencias[linha].azul);   
+        }
+  }   
+   
+   else { 
+          Serial.println("Erro: "); 
+          Serial.print("Comando invalido:"); 
+          Serial.println(MENSAGEM); 
+        }  
+  }
+   //FIM DAS COMUNICAÇOES
+    
+    maior = FreqVal[0];
+  for(int i =0; i<7; i++){
+    
+    if (maior < FreqVal[i])
+    {  
+    maior = FreqVal[i];  
+    }
+  }
+  //Serial.println(maior);
+  FastLED.setBrightness(maior);
+    
+    Audio.ReadFreq(FreqVal);//return 7 value of 7 bands pass filiter 
+                          //Frequency(Hz):63  160  400  1K  2.5K  6.25K  16K
+                          //FreqVal[]:      0    1    2    3    4    5    6  
+
+ 
+    if (JOGO == "CORESQUENTES")
+   {
+   coresquentes(FreqVal);
+   }
+   else if (JOGO == "DESLIGADO")
+   {
+   desliga(FreqVal);
+   }
+   else if (JOGO == "CORESFRIAS")
+   {
+   coresfrias(FreqVal);
+   }
+  else if (JOGO == "CORESALEATORIAS")
+   {
+   atualizaLeds(FreqVal);
+   }
+   else if (JOGO == "TOCATABELA")
+   {
+   
+    for(int f=0; f<7;f++)
+      {
+        for(int led = tabela_frequencias[f].led_inicio;led <= tabela_frequencias[f].led_fim; led++)
+        {
+         if(max((FreqVal[f]-100),0) > 75)    {leds[led] = CRGB( tabela_frequencias[f].vermelho, tabela_frequencias[f].verde, tabela_frequencias[f].azul);  FastLED.show();}
+         else                 {leds[led] = CRGB::Black; FastLED.show(); }
+        }
+      }
+   }  
+}    
+   
